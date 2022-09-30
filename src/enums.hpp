@@ -1,0 +1,56 @@
+enum token {
+    UNUSED,
+    OPENPAREN,
+    CLOSEPAREN,
+    OPENSQUARE,
+    CLOSESQUARE,
+    OPENCURLY,
+    CLOSECURLY,
+    SINGLEQUOTE,
+    PERIOD,
+    BACKTICK,
+    COMMA,
+    COMMAAT
+}
+
+enum type {
+    CONS,
+    SYMBOL,
+    STRING,
+    CHARACTER,
+    INTEGER,
+    FLOAT,
+    CFUNCTION,
+    STREAM,
+    ERROR
+}
+
+enum objectflags {
+    GCMARK,
+    PRMARK,
+    PACKED,
+    CAUGHT,
+    BUILTIN
+}
+
+enum errorcode {
+    BREAK=1,
+    OUTOFMEMORY=2,
+    NOTANUMBER=3,
+    NOTANINT=3,
+    NOTASTRING=4,
+    NOTALIST=5,
+    NOTASYMBOL=6,
+    MALFORMEDLIST=7,
+    TOOMANYARGS=8,
+    TOOFEWARGS=9,
+    OVERFLOW=10,
+    DIVBYZERO=11,
+    INDEXNEGATIVE=12,
+    INVALIDARG=13,
+    MALFORMEDCLAUSE=13,
+    OUTOFRANGE=14,
+    CANTTAKECAR=15,
+    CANTTAKECDR=16,
+    CUSTOM=65535
+}
