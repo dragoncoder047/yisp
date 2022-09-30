@@ -22,6 +22,7 @@ enum type {
 #define floatp(x)          ((x) != nil && (x)->type == FLOAT)
 #define numberp(x)         (integerp(x) || floatp(x))
 #define symbolp(x)         ((x) != nil && (x)->type == SYMBOL)
+#define keywordp(x)        (symbolp(x) && nthchar(x, 0) == ':')
 #define stringp(x)         ((x) != nil && (x)->type == STRING)
 #define characterp(x)      ((x) != nil && (x)->type == CHARACTER)
 #define streamp(x)         ((x) != nil && (x)->type == STREAM)
@@ -32,7 +33,7 @@ enum objectflags {
     PRMARK,
     PACKED,
     CAUGHT,
-    BUILTIN
+    BUILTIN,
 }
 #define oflag_set(x,f)     ((x)->objflags |= 1 << f)
 #define oflag_clr(x,f)     ((x)->objflags &= ~(1 << f))

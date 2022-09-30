@@ -53,3 +53,27 @@ class StringWriteStream : public Print {
         buildstring(c, &(this->tail));
     }
 }
+
+class PROGMEMReadStream : public Print {
+    PGM_P string;
+    uint32_t i;
+    uint32_t len;
+    PROGMEMReadStream(PGM_P str) {
+        this->string = str;
+        this->i = 0;
+        this->len = strlen_P(str);
+    }
+    int available() {
+        return this->len - this->i;
+    }
+    char read() {
+        this->i++;
+        return this->peek();
+    }
+    char peek() {
+        return pgm_read_byte(&this->string[this->i]);
+    }
+    int write(char c) {
+        return 0;
+    }
+}

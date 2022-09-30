@@ -67,8 +67,8 @@ object *dupstring(object *str) {
 
 // read from stream
 object *readstring(char delim, object *str) {
-    if (!streamp(str)) THROW_ERR(NOTASTREAM, str);
-    Stream *s = str->stream;
+    Stream *s = checkstream(str);
+    PR_VOIDERR();
     object *obj = newemptystring();
     PR_ERR(obj);
     object *tail = obj;

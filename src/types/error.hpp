@@ -34,8 +34,10 @@ object *VoidErr;
 // throw to the VoidError pointer (code and detail)
 #define THROW_VOIDERR(c, d) VoidErr = newerror(c, d); return 0
 // propagate VoidError -> returned error
+// put this after every function call that may cause an error but can't return one
 #define PR_VOIDERR() if (errorp(VoidErr) && !oflag_tst(VoidErr, CAUGHT)) { object *t = VoidErr; VoidErr = nil; return t; }
 // propagate returned error -> VoidError
+// use instead of PR_ERROR when you can't return an error
 #define PR_AS_VOIDERR(x) if (errorp(x) && !oflag_tst(x, CAUGHT)) { VoidErr = x; return 0; }
 // propagate VoidError -> VoidError
 #define VOID_ABORT() if (errorp(VoidErr) && !oflag_tst(VoidErr, CAUGHT)) return
