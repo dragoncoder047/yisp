@@ -1,10 +1,48 @@
-#include <Arduino.h>
+#include <Print.h>
+
+enum type {
+    UNASSIGNED,
+    CONS,
+    ARRAY,
+    SYMBOL,
+    STRING,
+    CHARACTER,
+    INTEGER,
+    FLOAT,
+    CFUNCTION,
+    STREAM,
+    ERROR
+}
+#define consp(x)           ((x) != nil && (x)->type == CONS)
+#define arrayp(x)          ((x) != nil && (x)->type == ARRAY)
+#define listp(x)           consp(x)
+#define improperp(x)       (!listp(x))
+#define atom(x)            (!consp(x))
+#define integerp(x)        ((x) != nil && (x)->type == INTEGER)
+#define floatp(x)          ((x) != nil && (x)->type == FLOAT)
+#define numberp(x)         (integerp(x) || floatp(x))
+#define symbolp(x)         ((x) != nil && (x)->type == SYMBOL)
+#define stringp(x)         ((x) != nil && (x)->type == STRING)
+#define characterp(x)      ((x) != nil && (x)->type == CHARACTER)
+#define streamp(x)         ((x) != nil && (x)->type == STREAM)
+#define errorp(x)          ((x) != nil && (x)->type == ERROR)
+
+enum objectflags {
+    GCMARK,
+    PRMARK,
+    PACKED,
+    CAUGHT,
+    BUILTIN
+}
+#define oflag_set(x,f)     ((x)->objflags |= 1 << f)
+#define oflag_clr(x,f)     ((x)->objflags &= ~(1 << f))
+#define oflag_tst(x,f)     ((x)->objflags & 1 << f)
 
 typedef struct sobject {
     uint8_t objflags;
     uint8_t type;
     union {
-        struct { // type = CONS
+        struct { // type = CONS || type == ARRAY
             sobject *car;
             sobject *cdr;
         };
@@ -20,7 +58,7 @@ typedef struct sobject {
         }
         struct { // type == STREAM
             sobject *name;
-            Stream *s;
+            Print *s;
         };
         struct { // type == ERROR
             uint32_t code;
@@ -31,24 +69,12 @@ typedef struct sobject {
 
 typedef object *(*fn_ptr_type)(object *, object *);
 
-uint32_t Freespace = 0;
-object *Freelist;
-
-object *newobj() {
-    object *temp = Freelist;
-    Freelist = cdr(Freelist);
-    Freespace--;
-    obj->objflags = 0;
-    if (Freespace == 0) {
-        obj->type = ERROR;
-        obj->code = OUTOFMEMORY;
-    }
-    return temp;
-}
-
-inline void freeobj(object *obj) {
-    car(obj) = NULL;
-    cdr(obj) = Freelist;
-    Freelist = obj;
-    Freespace++;
+// New char
+object *newchar(char c) {
+    object *o = newobj();
+    PR_ERR(o);
+    o->type = CHARACTER;
+    o->chars = c;
+    o->next = nil;
+    return o;
 }

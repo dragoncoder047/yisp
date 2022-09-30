@@ -8,12 +8,15 @@
   #define analogWrite(x,y) dacWrite((x), (y))
 #endif
 
+#define nil NULL
+
+// Forward references
+object *apply (object *function, object *args, object **env);
+char nthchar (object *string, int n);
+object *newerror(errorcode code, object *detail);
+object *newstring(char *buffer);
+
 // TODO: include everything
 #include "alloc.hpp"
 
 object Workspace[WORKSPACESIZE];
-
-object *GCStack;
-object *tee;
-object *apply (object *function, object *args, object **env);
-char nthchar (object *string, int n);
