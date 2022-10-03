@@ -6,5 +6,7 @@ volatile uint16_t Flags = 0;
 
 enum flag {
     PRINTREADABLY,
-    DISABLEGC
+    DISABLEGC,
+    ESCAPE,
+    NOESC,
 }

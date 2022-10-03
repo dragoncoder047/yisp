@@ -27,6 +27,7 @@ enum type {
 #define characterp(x)      ((x) != nil && (x)->type == CHARACTER)
 #define streamp(x)         ((x) != nil && (x)->type == STREAM)
 #define errorp(x)          ((x) != nil && (x)->type == ERROR)
+#define cfunp(x)           ((x) != nil && (x)->type == CFUNCTION)
 
 enum objectflags {
     GCMARK,
