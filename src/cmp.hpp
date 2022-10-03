@@ -6,8 +6,7 @@ bool eq(object *arg1, object *arg2) {
     if (arg1->type != arg2->type) return false; // Different type
     if (car(arg1) != car(arg2) || cdr(arg1) != cdr(arg2)) return false;  // Different values
     if (symbolp(arg1)) {  // Same symbol
-        object *args = cons(arg1, cons(arg2, nil));
-        return stringcompare(args, false, false, true);
+        return stringcompare(arg1, arg2, false, false, true);
     }
     return false;
 }
