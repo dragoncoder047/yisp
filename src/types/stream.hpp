@@ -1,4 +1,4 @@
-#include <Print.h>
+#include <Print.h> // Arduino library
 
 object *newstream(Print *s) {
     object *o = newobject();
@@ -21,6 +21,7 @@ class StringReadStream : public Print {
         return this->len - this->i;
     }
     char read() {
+        if (this->available() <= 0) return -1;
         this->i++;
         return this->peek();
     }
@@ -67,6 +68,7 @@ class PROGMEMReadStream : public Print {
         return this->len - this->i;
     }
     char read() {
+        if (this->available() <= 0) return -1;
         this->i++;
         return this->peek();
     }
