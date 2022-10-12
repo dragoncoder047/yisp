@@ -9,6 +9,9 @@
 #include <cstddef>
 #include "memory.cpp"
 
+// Change this to suit your platform
+#define WORKSPACESIZE 16384
+
 enum y_type {
     UNASSIGNED,
     CONS,
@@ -36,7 +39,7 @@ enum y_object_flag {
 
 typedef struct syobj {
     uint8_t objflags;
-    y_type type;
+    uint8_t type;
     union {
         // struct'ured like this so all "car" things and all "cdr" things are aligned with each other.
         struct {
@@ -110,9 +113,8 @@ typedef yobj *(*y_fun)(yisp_ctx *, yobj *, yobj *);
 typedef char (*gfun_t)();
 typedef void (*pfun_t)(char);
 
-template<int workspace_size>
 typedef struct s_ctx {
-    yobj workspace[workspace_size];
+    yobj workspace[WORKSPACESIZE];
     size_t free_space;
     yobj* free_list;
     yobj* gc_stack;
