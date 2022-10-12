@@ -31,7 +31,6 @@ bool _y_buildstring(yisp_ctx *y, char ch, yobj **tail) {
         nn = y_newobj(y, STRING);
         if (nullp(nn)) return true;
         (*tail)->next = nn;
-        nn->next = NULL;
         nn->chars = ch << 24;
         *tail = nn;
     }
@@ -39,18 +38,19 @@ bool _y_buildstring(yisp_ctx *y, char ch, yobj **tail) {
 
 // duplicates a string
 yobj *ystr_copy(yisp_ctx *y, yobj *str) {
-    yobj *dup = NULL;
+    Y_RETURN_ON_NULL(str);
+    Y_RETURN_ON_ERROR(str);
+    yobj *dup = y_newobj(y, STRING);
     yobj *tail = dup;
     yobj *n;
+    Y_RETURN_ON_NULL(dup);
+    tail->chars = str->chars;
+    str = str->next;
     while (str != NULL) {
         n = y_newobj(y, STRING);
         Y_RETURN_ON_NULL(n);
         n->chars = str->chars;
-        if (dup == NULL) {
-            dup = n;
-        } else {
-            tail->next = n;
-        }
+        tail->next = n;
         tail = n;
         str = str->next;
     }
