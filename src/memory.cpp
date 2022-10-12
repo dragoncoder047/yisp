@@ -13,7 +13,7 @@ bool keywordp(yobj *x) {
 yobj *y_newobj(yisp_ctx *y, y_type t = UNASSIGNED)  {
     if (y->free_space == 0) return NULL;
     yobj *temp = y->free_list;
-    y->free_list = y->free_list->cdr;
+    y->free_list = cdr(y->free_list);
     y->free_space--;
     temp->type = t;
     return temp;
