@@ -30,6 +30,8 @@ enum y_object_flag {
     GCMARK,
     PRMARK,
     CAUGHT,
+    FORMAT_1,
+    FORMAT_2,
 }
 
 typedef struct syobj {
