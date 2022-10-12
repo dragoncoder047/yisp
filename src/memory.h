@@ -42,15 +42,17 @@ typedef struct syobj {
                 syobj *car; // type = CONS || type == ARRAY
                 syobj *name; // type == STREAM
                 syobj *message; // type == ERROR
+                syobj *where; // type == ERRORDETAILS
                 uint32_t chars; // type == STRING || type == SYMBOL || type == CHARACTER || type == TOKEN
-                uint32_t info; // type == CFUNCTION
+                uint32_t funinfo; // type == CFUNCTION
                 gfun_t gfun; // type == STREAMINNER
             };
             union {
                 syobj *cdr; // type = CONS || type == ARRAY
                 syobj *next; // type == STRING || type == SYMBOL
                 syobj *funs; // type == STREAM
-                syobj *detail; // type == ERROR
+                syobj *einfo; // type == ERROR
+                syobj *detail; // type == ERRORDETAILS
                 y_fun *cfun; // type == CFUNCTION
                 pfun_t pfun; // type == STREAMINNER
             };
