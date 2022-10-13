@@ -4,6 +4,7 @@
 #define _yisp_eval_h_
 #include "memory.h"
 
+yobj *y_envlookup(yisp_ctx *y, yobj *key, yobj *env)
 yobj *y_eval(yisp_ctx *y, yobj *form, yobj *env);
 
 #include "eval.cpp"
