@@ -10,13 +10,6 @@ yobj *yfun_new(yisp_env *y, uin8_t minargs, uint8_t maxargs, uint8_t flags, y_fu
     return o;
 }
 
-enum y_ckargs_result {
-    OK,
-    TOOMANY,
-    TOOFEW,
-    NOTAFUNCTION
-}
-
 y_ckargs_result yfun_checkargs(yobj *f, yobj *args) {
     if (!cfunp(f)) return NOTAFUNCTION;
     size_t nargs = ycons_listlen(args);

@@ -150,7 +150,7 @@ inline void y_freeobj(yisp_ctx *y, yobj *obj) {
 void y_init(yisp_ctx *y);
 void ygc_markobject(yobj *obj);
 void ygc_sweep(yisp_ctx *y);
-size_t ygc_collect(yisp_ctx *y);
+size_t ygc_collect(yisp_ctx *y, yobj *form, yobj *env);
 
 // Misc function
 
