@@ -1,5 +1,6 @@
 
 #include "yerror.h"
+#include "ystring.h"
 
 // New error
 yobj *yerror_new(yisp_ctx *y, yobj *message, yobj *where = NULL, yobj *detail = NULL) {
@@ -16,4 +17,10 @@ yobj *yerror_new(yisp_ctx *y, yobj *message, yobj *where = NULL, yobj *detail = 
     }
     e->einfo = d;
     return e;
+}
+
+yobj *yerror_frommessage(yisp_ctx *y, char *message, yobj *where = NULL, yobj *detail = NULL) {
+    yobj *m = ystring_frombuffer(y, message);
+    Y_RETURN_ON_NULL(m);
+    return yerror_new(y, m, where, detail);
 }
