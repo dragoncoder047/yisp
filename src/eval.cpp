@@ -161,10 +161,66 @@ yobj *y_closure(yisp_ctx *y, bool tail, yobj *thunk, yobj *args, yobj **env) {
     return tf_progn(y, funbody, *env);
 }
 
-yobj *y_addargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
-
+void y_addargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
+    bool optional = false;
+    yobj *param;
+    yobj *arg;
+    while (params != NULL) {
+        // Step through the lists simultaneously.
+        param = car(params);
+        if (args) arg = car(args);
+        if (symbolp(param)) {
+            // If the current param is the symbol &optional, set optional=true.
+            if (ystr_isbuffer(param, "&optional")) optional = true;
+            // If the current param is the symbol &key, do ADDKEYS with remaining params and args, and stop.
+            else if (ystr_isbuffer(param, "&key")) {
+                y_addkwargs(y, params, args, env);
+                return;
+            }
+            // If the current param is the symbol &rest, expect another param after it, and then assign the remaining args to it, and stop.
+            else if (ystr_isbuffer(param, "&rest")) {
+                if (nullp(cdr(param))) {
+                    *env = yerror_frommessage(y, "&rest needs another param after it");
+                    return;
+                }
+                else {
+                    params = cdr(params);
+                    param = car(params);
+                    arg = args;
+                    args = NULL;
+                }
+            }
+            // If the current param is not a list, push cons(param, arg) to env, unless arg is nil and optional=false, then bail (too few args).
+            else if (nullp(args) && !optional) {
+                *env = yerror_frommessage(y, "too few args");
+                return;
+            }
+        }
+        else if (listp(param)) {
+            // If the current param is a list and optional=false, bail (invalid argument).
+            if (!optional) {
+                *env = yerror_frommessage(y, "list param must come after &optional");
+                return;
+            }
+            // If the current param is a list and optional=true, push cons(first(param), arg) if arg is not nil, else cons(first(param), second(param)).
+            else if (!nullp(arg)) {
+                if (consp(cdr(param))) arg = second(param);
+            }
+            param = first(param);
+        } else {
+            *env = yerror_frommessage(y, "invalid parameter");
+            return;
+        }
+        push(y, y_cons(y, param, arg), *env);
+        params = cdr(params);
+        if (args) args = cdr(args);
+    }
+    if (args) {
+        *env = yerror_frommessage(y, "too many args");
+        return;
+    }
 }
 
-yobj *y_addkwargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
+void y_addkwargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
     
 }
