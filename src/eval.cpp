@@ -63,8 +63,13 @@ yobj *y_eval(yisp_ctx *y, yobj *form, yobj *env) {
     else {
         // If it isn't one of those, try swapping the first two elements of the list. If that doesn't work, bail (not a function).
         if (ycons_listlength(args) >= 2) {
-            yobj *restargs = cdr(args);
-            yobj *mfunc = first(fun);
+            fun = first(args);
+            if (cfunp(fun) || (listp(fun) && symbolp(first(fun)) && (ystr_isbuffer(first(fun), "lambda") || ystr_isbuffer(first(fun), "macro")))) {
+                /* noop */;
+            } else {
+                return yerror_frommessage(y, "not a function", NULL, first(form));
+            }
+            args = y_cons(y, first(form), cdr(args));
         }
     }
     return yerror_frommessage(y, "TODO");
