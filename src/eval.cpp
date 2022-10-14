@@ -9,6 +9,7 @@
 
 yobj *y_envlookup(yisp_ctx *y, yobj *key, yobj *env) {
     for (; !nullp(env); env = cdr(env)) {
+        if (nullp(env)) break;
         yobj *pair = car(env);
         if (nullp(pair)) continue;
         if (y_eq(key, car(pair))) return cdr(pair);
@@ -171,14 +172,14 @@ void y_addargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
         if (args) arg = car(args);
         if (symbolp(param)) {
             // If the current param is the symbol &optional, set optional=true.
-            if (ystr_isbuffer(param, "&optional")) optional = true;
+            if (ystr_isbuffer(param, "&optional\0\0\0")) optional = true;
             // If the current param is the symbol &key, do ADDKEYS with remaining params and args, and stop.
-            else if (ystr_isbuffer(param, "&key")) {
+            else if (ystr_isbuffer(param, "&key\0\0\0")) {
                 y_addkwargs(y, params, args, env);
                 return;
             }
             // If the current param is the symbol &rest, expect another param after it, and then assign the remaining args to it, and stop.
-            else if (ystr_isbuffer(param, "&rest")) {
+            else if (ystr_isbuffer(param, "&rest\0\0\0")) {
                 if (nullp(cdr(param))) {
                     *env = yerror_frommessage(y, "&rest needs another param after it");
                     return;
@@ -199,7 +200,7 @@ void y_addargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
         else if (listp(param)) {
             // If the current param is a list and optional=false, bail (invalid argument).
             if (!optional) {
-                *env = yerror_frommessage(y, "list param must come after &optional");
+                *env = yerror_frommessage(y, "param with default must come after &optional");
                 return;
             }
             // If the current param is a list and optional=true, push cons(first(param), arg) if arg is not nil, else cons(first(param), second(param)).
@@ -217,10 +218,59 @@ void y_addargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
     }
     if (args) {
         *env = yerror_frommessage(y, "too many args");
-        return;
     }
 }
 
 void y_addkwargs(yisp_ctx, *y, yobj *params, yobj *args, yobj **env) {
-    
+    if (nullp(params_copy)) {
+        **env = NULL;
+        return;
+    }
+    char *buffer[64]; // For cutting off the : on the keyword
+    while (args != NULL) {
+        // Expect the first to be a keyword. If it is not, bail (not a keyword).
+        if (!keywordp(first(args))) {
+            *env = yerror_frommessage(y, "expected a keyword here");
+            return;
+        }
+        ystr_tobuffer(first(args), buffer, sizeof(buffer));
+        // Go through the params list, looking for the un-: version of the keyword.
+        yobj *params_head = params;
+        bool found = false;
+        while (params_head != NULL) {
+            if (!yoflag_tst(car(params_head), KWUSED)) {
+                yobj *param = car(params_head);
+                if (!symbolp(param)) {
+                    *env = yerror_frommessage(y, "invalid keyword parameter", NULL, params);
+                    return;
+                }
+                if (ystr_isbuffer(param, buffer + 1)) { // to cut off :
+                    if (ycons_listlen(args) < 2) {
+                        *env = yerror_frommessage(y, "need argument after keyword", NULL, param);
+                    }
+                    // Push cons(param, second(args)) to the env.
+                    push(y, y_cons(y, param, second(args)), *env);
+                    args = cddr(args);
+                    // splice the used param out.
+                    yoflag_set(param, KWUSED);
+                    found = true;
+                }
+            }
+            params_head = cdr(params_head)
+        }
+        // If the specified keyword is not in the params list, bail (no such keyword argument).
+        if (!found) {
+            *env = yerror_frommessage(y, "no such keyword argument", NULL, first(args));
+            return;
+        }
+    }
+    // add remaining params as NULL
+    // clear USED flag on params
+    for (yobj *pc = params; pc != NULL, pc = cdr(pc)) {
+        if (pc == NULL) break;
+        if (yoflag_tst(car(pc), KWUSED)) yoflag_clr(car(pc), KWUSED);
+        else {
+            push(y, y_cons(y, car(pc), NULL), *env);
+        }
+    }
 }

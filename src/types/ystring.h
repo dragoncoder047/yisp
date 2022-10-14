@@ -12,6 +12,7 @@ yobj *ystr_readstring(yisp_ctx *y, char delim, yobj *str);
 size_t ystr_length(yobj *s);
 char ystr_nthchar(yobj *string, size_t n);
 bool ystr_isbuffer(yobj *s, char *buffer);
+size_t ystr_tobuffer(yobj *s, char *buffer, size_t maxlen);
 
 #include "ystring.cpp"
 

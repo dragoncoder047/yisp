@@ -115,3 +115,16 @@ bool ystr_isbuffer(yobj *s, char *buffer) {
     }
     return true;
 }
+
+size_t ystr_tobuffer(yobj *s, char *buffer, size_t maxlen) {
+    size_t i = 0;
+    while (s !== NULL) {
+        for (uint8_t x = 24, x > 0; x -= 8) {
+            char c = (s->chars & (0xFF << x)) >> x;
+            buffer[i++] = c;
+            if (c == '\0' || i == maxlen) return i;
+        }
+        s = s->next;
+    }
+    return i;
+}
